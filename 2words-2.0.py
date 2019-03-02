@@ -27,7 +27,6 @@ import os
 starwords = []
 names = []
 
-#path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/text-datasets/nietzsche.txt')
 path = "ch/youtuber.txt"
 text = open(path,encoding="utf8").read().lower()
 print('corpus length:', len(text))
@@ -53,9 +52,6 @@ for (cc,num) in sorted_by_value:#過濾開頭字
         starwords.append((cc))
 
     
-
-
-# cut the text in semi-redundant sequences of maxlen characters
 maxlen = 1 
 step = 1
 sentences = []
@@ -78,9 +74,7 @@ for i, sentence in enumerate(sentences):
     y[i, char_indices[next_chars[i]]] = 1
 
 
-
-
-# build the model: a single LSTM
+# build the model: Bi-LSTM
 print('Build model...')
 model = Sequential()
 model.add(Bidirectional(LSTM(128, return_sequences=True),input_shape=(maxlen, len(chars))))
@@ -90,11 +84,6 @@ model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
 optimizer = RMSprop(lr=0.01) #lr : Learning rate
 model.compile(loss='categorical_crossentropy', optimizer=optimizer,metrics=['accuracy'])
-#model.save('2words_model.h5')
-# Deletes the existing model
-#del model  
-# Returns a compiled model identical to the previous one
-#model = load_model('2words_model.h5')
 
 
 def sample(preds, temperature=1.0):
@@ -106,8 +95,6 @@ def sample(preds, temperature=1.0):
     #return np.argmax(probas)#argmax 矩陣中最大值的索引 也就是該字的編號 
     
 
-#starwords = random.sample(list(indices_char) , 500)#隨機於字典挑選50個開頭字
-#starwords=["陳","聖","三","五","網","張"]
 txt_file=open("2words.txt","w",encoding='utf8')
 txt_file2=open("2words反.txt","w",encoding='utf8')
 
@@ -173,8 +160,7 @@ for r in output2:
 
 txt_file.close()
 txt_file2.close()
-#cmd = '3words_lstm.py'
-#os.system(cmd)
+
 
 
 
