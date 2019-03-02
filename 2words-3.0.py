@@ -23,7 +23,7 @@ import random
 import sys
 import os
 
-#path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/text-datasets/nietzsche.txt')
+
 path = "ch/Data/youtuber.txt"
 text = open(path,encoding="utf8").read().lower()
 print('corpus length:', len(text))
@@ -33,7 +33,6 @@ print('total chars:', len(chars))
 char_indices = dict((c, i) for i, c in enumerate(chars)) #char > index (我,1)
 indices_char = dict((i, c) for i, c in enumerate(chars))#index > char (1,我)
 
-# cut the text in semi-redundant sequences of maxlen characters
 maxlen = 1 
 step = 2
 sentences = []
@@ -51,7 +50,7 @@ for i, sentence in enumerate(sentences):
         X[i, t, char_indices[char]] = 1
     y[i, char_indices[next_chars[i]]] = 1
 
-# build the model: a single LSTM
+# build the model: Bi-LSTM
 print('Build model...')
 model = Sequential()
 model.add(Bidirectional(LSTM(128, return_sequences=True),input_shape=(maxlen, len(chars))))
@@ -61,11 +60,7 @@ model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
 optimizer = RMSprop(lr=0.01) #lr : Learning rate
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
-#model.save('2words_model.h5')
-# Deletes the existing model
-#del model  
-# Returns a compiled model identical to the previous one
-#model = load_model('2words_model.h5')
+
 
 ###############################################################################
 
@@ -92,7 +87,7 @@ def yeepre(sentence):
 ###############################################################################
     
 
-starwords = random.sample(list(indices_char) , 200)#隨機於字典挑選50個開頭字
+starwords = random.sample(list(indices_char) , 200)#隨機於字典挑選開頭字
 txt_file=open("2words.txt","w",encoding='utf8')
 # train the model, output generated text after each iteration
 for iteration in range(1, 50):#疊代次數
@@ -109,13 +104,6 @@ for iteration in range(1, 50):#疊代次數
 for z in starwords:
     sentence = indices_char[z] #數字轉字
               
-        #for diversity in [1.0]:
-   
-                #print('----- diversity:', diversity)
-                #generated = sentence+''
-                #sentence = text[start_index: start_index + maxlen] # slicing list  ex:A[n:m] n讀取到m-1 
-                #sentence = indices_char[724] 
-                #generated += sentence 
     print()
     print('----- Generating with seed: "' + sentence + '"')   
         
@@ -157,5 +145,4 @@ for w in output:
 print()
 print(model.summary())
 txt_file.close()
-#cmd = '3words_lstm.py'
-#os.system(cmd)
+
